@@ -1,0 +1,84 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+%matplotlib inline
+import seaborn; seaborn.set()
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
+from matplotlib.colors import ListedColormap
+
+transfer=pd.read_csv("transfer.csv", encoding = "ANSI",usecols=[0,1,2,4,6,7])
+transfer.head()
+transfer_later=pd.read_csv("transfer_latter.csv", encoding = "ANSI",usecols=[0,1,2,4,6,7])
+transfer_later.head()
+
+transfer.describe()
+transfer["DEVICE_ID"].value_counts()
+devices=transfer["DEVICE_ID"].value_counts()
+device1=devices.to_dict()
+transfer['Count'] = transfer['DEVICE_ID'].map(device1) 
+transfer.head()
+usedata={}
+idnum=[]
+count=[]
+for i in range(440000):
+    if (transfer['DEVICE_ID'][i] not in usedata) and (transfer['Count'][i]>100):
+        idnum.append(transfer['DEVICE_ID'][i])
+        count.append(transfer['Count'][i])
+        
+for i in range(440000,677172):
+    if (transfer['DEVICE_ID'][i] not in usedata) and (transfer['Count'][i]>100):
+        idnum.append(transfer['DEVICE_ID'][i])
+        count.append(transfer['Count'][i])  
+ usedata['DEVICE_ID']=idnum
+usedata['Count']=count
+usedatawithcount=date = pd.DataFrame(data=usedata)
+usedatawithcount.drop_duplicates(['DEVICE_ID']).reset_index().drop("index",axis=1)
+count={}
+for i in range(len(usedatawithcount)):
+    if usedatawithcount['DEVICE_ID'][i] not in count:
+        count[usedatawithcount['DEVICE_ID'][i]]=usedatawithcount['Count'][i]
+datauseful=[]
+for i in devices[devices>100].index:
+    datauseful.append(i)
+datauseful
+dic={}
+counts=[]
+days=[]
+for i in date["DATE"]:
+    if i not in dic:
+        dic[i]=0
+    if i in dic:
+        dic[i]+=1
+for i in dic.values():
+    counts.append(i)
+for j in dic.keys():
+    days.append(j)
+dic_date=pd.DataFrame(data = {'DATE':days, 'COUNTS':counts})
+dic_date
+dic={}
+time=[]
+for i in range(0,44):
+    for j in transfer.CREATED_DATE[i*10000:(i+1)*10000]:
+        time.append(j[12:14])
+
+dic["TIME"]=time
+timeslot = pd.DataFrame(data=dic)
+timeslot["TIME"].value_counts()
+search=pd.read_csv("search.csv", encoding = "ANSI",usecols=[0,1,12,13,16,22])
+search=search[4:]
+search.head()
+search=search.drop_duplicates(['EQUIPMENT_NUMBER','EQUIPMENT_TYPE','DEVICE_ID','DEVICE_FW_VERSION / SW_VERSION','CONTROLLER_SW_VERSION']).reset_index().drop("index",axis=1)
+search.head()
+search[['EQUIPMENT_NUMBER']] = search[['EQUIPMENT_NUMBER']].astype(int)
+# make the EQUIPMENT_NUMBER as aninteger rather than a float
+index = search['EQUIPMENT_NUMBER'].isin(usefuldata['EQUIPMENT'])
+outfile = search[index]
+outfile.to_csv('outfile.csv', index=False)
+lis1=[]
+counts={}
+for i in outfile['EQUIPMENT_NUMBER']:
+    if i in count:
+        lis1.append(count[i])
+
+outfile["Count"]=lis1
